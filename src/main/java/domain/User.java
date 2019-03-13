@@ -1,45 +1,114 @@
 package domain;
 
+import Authentication.Group;
+import Authentication.UserDTO;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "User")
 public class User implements Serializable {
+    @Id
+    @Column(unique=true, nullable=false, length=128)
+    private String email;
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable=false, length=128)
+    private String firstName;
 
-   private Long id;
+    @Column(nullable=false, length=128)
+    private String lastName;
 
-   @Size(min = 10, max = 200, message = "About Me must be between 10 and 200 characters")
-   private String first_name;
+    @Column(nullable=false, length=128) //sha-512 + hex
+    private String password;
 
-   private String last_name;
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Column(nullable=false)
+    private Date registeredOn;
 
-   public Long getId() {
-      return id;
-   }
+    @ElementCollection(targetClass = Group.class)
+    @CollectionTable(name = "USERS_GROUPS",
+            joinColumns       = @JoinColumn(name = "email", nullable=false),
+            uniqueConstraints = { @UniqueConstraint(columnNames={"email","groupname"}) } )
+    @Enumerated(EnumType.STRING)
+    @Column(name="groupname", length=64, nullable=false)
+    private List<Group> groups;
 
-   public void setLast_name(String last_name) {
-      this.last_name = last_name;
-   }
+    public User(){
 
-   public String getLast_name() {
-      return last_name;
-   }
+    }
 
-   public void setFirst_name(String first_name) {
-      this.first_name = first_name;
-   }
+    public User(UserDTO user){
 
-   public String getFirst_name() {
-      return first_name;
-   }
+        if (user.getPassword1() == null || user.getPassword1().length() == 0
+                || !user.getPassword1().equals(user.getPassword2()) )
+            throw new RuntimeException("Password 1 and Password 2 have to be equal (typo?)");
 
-   @Override
-   public String toString() {
-      return "User{" + "id=" + id + ", first_name='" + first_name + '\'' + ", last_name='" + last_name + '\'' + '}';
-   }
+        this.email        = user.getEmail();
+        this.firstName    = user.getFirstName();
+        this.lastName     = user.getLastName();
+        this.password     = DigestUtils.sha512Hex(user.getPassword1() );
+        this.registeredOn = new Date();
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * @return the password in SHA512 HEX representation
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Date getRegisteredOn() {
+        return registeredOn;
+    }
+
+    public void setRegisteredOn(Date registeredOn) {
+        this.registeredOn = registeredOn;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    @Override
+    public String toString() {
+        return "User [email=" + email + ", firstName=" + firstName
+                + ", lastName=" + lastName + ", password=" + password
+                + ", registeredOn=" + registeredOn + ", groups=" + groups + "]";
+    }
 }

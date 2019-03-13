@@ -1,14 +1,10 @@
-<%@ page import="domain.User" %>
-<%@ page import="java.util.List" %>
 <html>
 <body>
 <h2>home!</h2>
+<div id="app">
+    <test></test>
+</div>
 
-<%
-    List<User> users = (List<User>) request.getAttribute("users");
-    for (User u : users) {
-        out.print("<strong>" + u.getFirst_name() + "</strong><br/>");
-    }
-%>
+<script src="./js/app.js"></script>
 </body>
 </html>

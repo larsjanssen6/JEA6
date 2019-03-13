@@ -3,4 +3,27 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <display-name>Archetype Created Web Application</display-name>
+
+  <welcome-file-list>
+    <welcome-file>welcome.jsp</welcome-file>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+  <!--  login Config -->
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>userMgmtJdbcRealm</realm-name>
+  </login-config>
+  <!-- roles -->
+  <security-role>
+    <role-name>ADMINISTRATOR</role-name>
+  </security-role>
+  <security-role>
+    <role-name>USER</role-name>
+  </security-role>
+  <security-role>
+    <role-name>DEFAULT</role-name>
+  </security-role>
 </web-app>
