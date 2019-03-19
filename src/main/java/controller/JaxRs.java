@@ -88,7 +88,7 @@ public class JaxRs {
                 e.printStackTrace();
                 json.setStatus("FAILED");
                 json.setErrorMsg("Authentication failed");
-                return Response.ok().entity(json).build();
+                return Response.serverError().entity(json).build();
             }
         }else{
             req.getServletContext().log("Skip logged because already logged in: "+userLogin.getEmail());
@@ -105,6 +105,25 @@ public class JaxRs {
         userBean.detach(user);
         user.setPassword(null);
         user.setGroups(null);
+        return Response.ok().entity(json).build();
+    }
+
+    @GET
+    @Path("logout")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logout(@Context HttpServletRequest req) {
+
+        JsonResponse json = new JsonResponse();
+
+        try {
+            req.logout();
+            json.setStatus("SUCCESS");
+            req.getSession().invalidate();
+        } catch (ServletException e) {
+            e.printStackTrace();
+            json.setStatus("FAILED");
+            json.setErrorMsg("Logout failed on backend");
+        }
         return Response.ok().entity(json).build();
     }
 }

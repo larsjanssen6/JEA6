@@ -1,14 +1,10 @@
 <html>
 <body>
-<h2>Test</h2>
+<h2>home!</h2>
+<div id="app">
+    <test></test>
+</div>
 
-<form method="post" action="/1/home">
-    <input type="text" name="first_name" />
-    <input type="text" name="last_name" />
-
-    <button type="submit">
-        Submit
-    </button>
-</form>
+<script src="./js/app.js?version=1"></script>
 </body>
 </html>
