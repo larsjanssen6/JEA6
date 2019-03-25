@@ -1,3 +1,5 @@
 {
-    "/src/main/webapp/js/app.js": "/src/main/webapp/js/app.js"
+    "/src/main/webapp/js/session/app.js": "/src/main/webapp/js/session/app.js",
+    "/src/main/webapp/css/app.css": "/src/main/webapp/css/app.css",
+    "/src/main/webapp/js/token/app.js": "/src/main/webapp/js/token/app.js"
 }
