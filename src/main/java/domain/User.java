@@ -6,6 +6,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,9 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name="groupname", length=64, nullable=false)
     private List<Group> groups;
+
+    @Transient
+    private List<Link> links = new ArrayList<>();
 
     public User(){
 
@@ -110,5 +114,21 @@ public class User implements Serializable {
         return "User [email=" + email + ", firstName=" + firstName
                 + ", lastName=" + lastName + ", password=" + password
                 + ", registeredOn=" + registeredOn + ", groups=" + groups + "]";
+    }
+
+    public List<Link> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public void addLink(String url, String rel)
+    {
+        Link link = new Link();
+        link.setLink(url);
+        link.setRel(rel);
+        links.add(link);
     }
 }

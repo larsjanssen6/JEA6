@@ -7,15 +7,13 @@ import Response.JsonResponse;
 import domain.User;
 import domain.UserLogin;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +100,17 @@ public class JaxRs {
     }
 
     @GET
+    @Path("user/{email}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public User all(@PathParam("email") String email, @Context UriInfo uriInfo) {
+        User user = userBean.find(email);
+        String uri = getUriForSelf(uriInfo, user);
+        user.addLink(uri, "self");
+        return user;
+    }
+
+    @GET
     @Path("logout")
     @Produces(MediaType.APPLICATION_JSON)
     public Response logout(@Context HttpServletRequest req) {
@@ -118,5 +127,14 @@ public class JaxRs {
             json.setErrorMsg("Logout failed on backend");
         }
         return Response.ok().entity(json).build();
+    }
+
+    private String getUriForSelf(UriInfo uriInfo, User user)
+    {
+        return uriInfo.getBaseUriBuilder()
+                .path(JaxRs.class)
+                .path(user.getEmail())
+                .build()
+                .toString();
     }
 }
