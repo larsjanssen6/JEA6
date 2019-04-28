@@ -1,36 +1,38 @@
-package controller.Authentication.JWT;
+package controller.Authentication.Facebook;
 
-import java.time.ZoneId;
-
-import Authentication.UserDTO;
 import Jwt.Util.KeyGenerator;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
-import domain.User;
-import domain.UserLogin;
-import interceptor.SimpleInterceptor;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.Version;
+
+import javax.ejb.EJB;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import com.restfb.types.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.digest.DigestUtils;
 import repos.User.IUserRepo;
 
-import javax.ejb.EJB;
-import javax.interceptor.Interceptors;
-import javax.ws.rs.core.UriInfo;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 import java.security.Key;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
-@Path("/jwt")
-@Interceptors(SimpleInterceptor.class)
-public class JwtController {
+@Path("/callback")
+public class FacebookCallbackController {
     @EJB
     private IUserRepo userRepo;
 
@@ -40,36 +42,33 @@ public class JwtController {
     @Context
     private UriInfo uriInfo;
 
-    @POST
+    public FacebookCallbackController() { }
+
+    @GET
     @Path("login")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @TransactionAttribute(TransactionAttributeType.NEVER)
-    public Response login(UserLogin userLogin,
-                          @Context HttpServletRequest req) {
+    public Response login(@Context HttpServletRequest request) {
 
-        if (userRepo.login(userLogin.getEmail(), DigestUtils.sha512Hex(userLogin.getPassword()))) {
-            return Response
-                    .status(Response.Status.OK)
-                    .entity(issueToken(userLogin.getEmail()))
-                    .build();
+        FacebookClient facebookClient = new DefaultFacebookClient(request.getParameter("access_token"), Version.VERSION_2_6);
+        User user = facebookClient.fetchObject("me", User.class, Parameter.with("fields", "name, email"));
+
+        String[] splited = user.getName().split("\\s+");
+
+        if(userRepo.find(user.getEmail()) == null) {
+            domain.User usr = new domain.User();
+            usr.setFirstName(splited[0]);
+            usr.setLastName(splited[1]);
+            usr.setEmail(user.getEmail());
+            usr.setRegisteredOn(new Date());
+            usr.setPassword(DigestUtils.sha512Hex("abcdefghijklmnop"));
+            userRepo.save(usr);
         }
-
-        return Response.status(UNAUTHORIZED).build();
-    }
-
-    @POST
-    @Path("register")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @TransactionAttribute(TransactionAttributeType.NEVER)
-    public Response register(UserDTO userDTO, @Context HttpServletRequest req) {
-        User newUser = new User(userDTO);
-        userRepo.save(newUser);
 
         return Response
                 .status(Response.Status.OK)
-                .entity(issueToken(newUser.getEmail()))
+                .entity(issueToken(user.getEmail()))
                 .build();
     }
 
