@@ -2,6 +2,7 @@ package domain;
 
 import Authentication.Group;
 import Authentication.UserDTO;
+import domain.Game.UserGame;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.persistence.*;
@@ -14,7 +15,10 @@ import java.util.List;
 @Table(name = "User")
 public class User implements Serializable {
     @Id
-    @Column(unique=true, nullable=false, length=128)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(nullable=false, length=128)
     private String email;
 
     @Column(nullable=false, length=128)
@@ -30,14 +34,6 @@ public class User implements Serializable {
     @Column(nullable=false)
     private Date registeredOn;
 
-    @ElementCollection(targetClass = Group.class)
-    @CollectionTable(name = "USERS_GROUPS",
-            joinColumns       = @JoinColumn(name = "email", nullable=false),
-            uniqueConstraints = { @UniqueConstraint(columnNames={"email","groupname"}) } )
-    @Enumerated(EnumType.STRING)
-    @Column(name="groupname", length=64, nullable=false)
-    private List<Group> groups;
-
     @Transient
     private List<Link> links = new ArrayList<>();
 
@@ -45,17 +41,21 @@ public class User implements Serializable {
 
     }
 
-    public User(UserDTO user){
-
-        if (user.getPassword1() == null || user.getPassword1().length() == 0
-                || !user.getPassword1().equals(user.getPassword2()) )
-            throw new RuntimeException("Password 1 and Password 2 have to be equal (typo?)");
-
+    public User(UserDTO user) {
+        this.id           = user.getId();
         this.email        = user.getEmail();
         this.firstName    = user.getFirstName();
         this.lastName     = user.getLastName();
-        this.password     = DigestUtils.sha512Hex(user.getPassword1() );
+        this.password     = DigestUtils.sha512Hex(user.getPassword() );
         this.registeredOn = new Date();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -99,21 +99,6 @@ public class User implements Serializable {
 
     public void setRegisteredOn(Date registeredOn) {
         this.registeredOn = registeredOn;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
-
-    @Override
-    public String toString() {
-        return "User [email=" + email + ", firstName=" + firstName
-                + ", lastName=" + lastName + ", password=" + password
-                + ", registeredOn=" + registeredOn + ", groups=" + groups + "]";
     }
 
     public List<Link> getLinks() {
