@@ -5,10 +5,7 @@ mix.options({
     processCssUrls: false
 });
 
-mix.js('frontend/session/app.js', 'src/main/webapp/js/session')
-    .version();
-
-mix.js('frontend/token/app.js', 'src/main/webapp/js/token')
+mix.js('frontend/app.js', 'src/main/webapp/js')
     .version();
 
 mix.sass('frontend/css/app.scss', 'src/main/webapp/css')
