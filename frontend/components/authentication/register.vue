@@ -88,7 +88,7 @@
             register() {
                 axios.post('/api/jwt/register', this.form).then(({data}) => {
                     localStorage.setItem('token', data);
-                    this.$router.push({name:'games'})
+                    window.location.href = '/1/home';
                 }).catch((error) => {
                     alert('Wrong credentials!');
                 });

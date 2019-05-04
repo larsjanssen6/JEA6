@@ -61,8 +61,9 @@
         methods: {
             login() {
                 axios.post('/api/jwt/login', this.form).then(({data}) => {
-                    localStorage.setItem('token', data);
-                    this.$router.push({name:'games'})
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user-id', data.userId);
+                    window.location.href = '/1/home';
                 }).catch((error) => {
                     alert('Wrong credentials!');
                 });

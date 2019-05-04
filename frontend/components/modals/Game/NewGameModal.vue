@@ -5,8 +5,8 @@
            :max-width="maxWidth"
            height="auto">
 
-        <form id="scroll" class="overflow-y-auto p-8 center w-full h-full" @submit.prevent="create()">
-            <div class="center w-full flex-col">
+        <form id="scroll" class="overflow-y-auto p-8 center" @submit.prevent="create()">
+            <div class="center flex-col">
                 <h2 class="text-black text-center text-2xl">Nieuwe game</h2>
 
                 <div class="w-full">
@@ -24,7 +24,6 @@
                                id="description"
                                placeholder="Omschrijving"></textarea>
 
-
                         <button class="bg-grey-darker mt-4 hover:bg-grey text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                             Opslaan
                         </button>
@@ -36,6 +35,8 @@
 </template>
 
 <script>
+    import axios from '../../../axios';
+
     export default {
         data() {
             return {
@@ -49,8 +50,7 @@
 
         methods: {
             create() {
-
-                axios.post('/1/api/game', this.form).then((response) => {
+                axios.post('/api/game/' + localStorage.getItem('user-id'), this.form).then((response) => {
                     window.location.reload();
                 });
             }
