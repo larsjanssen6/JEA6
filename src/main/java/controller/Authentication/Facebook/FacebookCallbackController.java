@@ -5,7 +5,6 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
 import com.restfb.Version;
-
 import javax.ejb.EJB;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -19,13 +18,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import com.restfb.types.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.digest.DigestUtils;
 import repos.User.IUserRepo;
-
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -56,8 +53,15 @@ public class FacebookCallbackController {
 
         String[] splited = user.getName().split("\\s+");
 
+        /*
+        |--------------------------------------------------------------------------
+        | If the user already exists in our database only return a valid token.
+        | Otherwise register the user and create the token
+        |--------------------------------------------------------------------------
+        */
+
         if(userRepo.find(user.getEmail()) == null) {
-            domain.User usr = new domain.User();
+            domain.User.User usr = new domain.User.User();
             usr.setFirstName(splited[0]);
             usr.setLastName(splited[1]);
             usr.setEmail(user.getEmail());
@@ -66,13 +70,28 @@ public class FacebookCallbackController {
             userRepo.save(usr);
         }
 
+        final Long finalUserId = userRepo.find(user.getEmail()).getId();
+        final String finalToken = issueToken(user.getEmail());
+
+        Object response = new Object() {
+            public final Long userId = finalUserId;
+            public final String token = finalToken;
+        };
+
         return Response
                 .status(Response.Status.OK)
-                .entity(issueToken(user.getEmail()))
+                .entity(response)
                 .build();
     }
 
     private String issueToken(String login) {
+
+          /*
+        |--------------------------------------------------------------------------
+        | Generate the JWT token and set the expiration time.
+        |--------------------------------------------------------------------------
+        */
+
         Key key = keyGenerator.generateKey();
         String jwtToken = Jwts.builder()
                 .setSubject(login)

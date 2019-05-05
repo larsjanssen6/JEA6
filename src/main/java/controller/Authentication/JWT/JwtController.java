@@ -1,28 +1,23 @@
 package controller.Authentication.JWT;
 
 import java.time.ZoneId;
-
 import Authentication.UserDTO;
 import Jwt.Util.KeyGenerator;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
-import domain.User;
-import domain.UserLogin;
+import domain.User.User;
+import domain.User.UserLogin;
 import interceptor.SimpleInterceptor;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.digest.DigestUtils;
 import repos.User.IUserRepo;
-
 import javax.ejb.EJB;
 import javax.interceptor.Interceptors;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
 import java.security.Key;
 import java.time.LocalDateTime;
@@ -49,9 +44,18 @@ public class JwtController {
                           @Context HttpServletRequest req) {
 
         if (userRepo.login(userLogin.getEmail(), DigestUtils.sha512Hex(userLogin.getPassword()))) {
+
+            final Long finalUserId = userRepo.find(userLogin.getEmail()).getId();
+            final String finalToken = issueToken(userLogin.getEmail());
+
+            Object response = new Object() {
+                public final Long userId = finalUserId;
+                public final String token = finalToken;
+            };
+
             return Response
                     .status(Response.Status.OK)
-                    .entity(issueToken(userLogin.getEmail()))
+                    .entity(response)
                     .build();
         }
 
@@ -67,9 +71,17 @@ public class JwtController {
         User newUser = new User(userDTO);
         userRepo.save(newUser);
 
+        final Long finalUserId = userRepo.find(newUser.getEmail()).getId();
+        final String finalToken = issueToken(newUser.getEmail());
+
+        Object response = new Object() {
+            public final Long userId = finalUserId;
+            public final String token = finalToken;
+        };
+
         return Response
                 .status(Response.Status.OK)
-                .entity(issueToken(newUser.getEmail()))
+                .entity(response)
                 .build();
     }
 
