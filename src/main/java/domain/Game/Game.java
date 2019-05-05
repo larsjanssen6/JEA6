@@ -1,7 +1,5 @@
 package domain.Game;
 
-import domain.User;
-
 import java.util.Date;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,9 +17,6 @@ public class Game implements Serializable {
     @Column(nullable=false, length=128)
     private String description;
 
-    @Column(nullable=false)
-    private Date created_at;
-
     public Game() {
     }
 
@@ -29,7 +24,6 @@ public class Game implements Serializable {
         this.id = gameDTO.getId();
         this.name = gameDTO.getName();
         this.description = gameDTO.getDescription();
-        this.created_at = gameDTO.getCreated_at();
     }
 
     public long getId() {
@@ -54,13 +48,5 @@ public class Game implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Date getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
     }
 }

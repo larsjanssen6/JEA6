@@ -1,6 +1,6 @@
 package domain.Game;
 
-import domain.User;
+import domain.User.User;
 
 public class UserGameDTO {
     private long id;

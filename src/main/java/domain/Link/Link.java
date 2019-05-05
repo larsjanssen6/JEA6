@@ -1,4 +1,4 @@
-package domain;
+package domain.Link;
 
 public class Link {
     private String link;

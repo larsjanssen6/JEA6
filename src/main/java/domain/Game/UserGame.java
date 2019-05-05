@@ -1,7 +1,6 @@
 package domain.Game;
 
-import domain.User;
-
+import domain.User.User;
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -12,14 +11,13 @@ public class UserGame implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Game game;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.REMOVE)
     private User user;
 
-    public UserGame() {
-    }
+    public UserGame() { }
 
     public UserGame(UserGameDTO userGameDTO) {
         this.id = userGameDTO.getId();
