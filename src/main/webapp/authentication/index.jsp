@@ -20,9 +20,9 @@
     function statusChangeCallback(response) {
         if (response.status === 'connected') {
             axios.get('/1/api/callback/login?access_token='+response.authResponse.accessToken).then(({data}) => {
-                //Login was successful et the token.
-                localStorage.setItem('token', data);
-
+                //Login was successful set the token.
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user-id', data.userId);
                 //Redirect to home page
                 window.location.href = '/1/home';
             });
@@ -52,6 +52,10 @@
     };
     // Load the SDK asynchronously
     (function(d, s, id) {
+        if(localStorage.getItem('token')) {
+            return;
+        }
+
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
         js = d.createElement(s); js.id = id;
