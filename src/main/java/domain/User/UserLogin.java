@@ -1,4 +1,4 @@
-package domain;
+package domain.User;
 
 public class UserLogin {
     private String email;

@@ -1,10 +1,8 @@
-package domain;
+package domain.User;
 
-import Authentication.Group;
 import Authentication.UserDTO;
-import domain.Game.UserGame;
+import domain.Link.Link;
 import org.apache.commons.codec.digest.DigestUtils;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,9 +35,7 @@ public class User implements Serializable {
     @Transient
     private List<Link> links = new ArrayList<>();
 
-    public User(){
-
-    }
+    public User() {}
 
     public User(UserDTO user) {
         this.id           = user.getId();
