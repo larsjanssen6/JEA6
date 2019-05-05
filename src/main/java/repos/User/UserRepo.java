@@ -1,14 +1,10 @@
 package repos.User;
 
-import domain.User;
+import domain.User.User;
 import interceptor.SimpleInterceptor;
-
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceContext;
+import javax.persistence.*;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -53,12 +49,30 @@ public class UserRepo implements IUserRepo {
 
     public User find(String email) {
         try {
-            return em.find(User.class, email);
+            return em.createQuery("select u from User u where u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        }
+
+        catch (NoResultException ex) {
+            return null;
+        }
+    }
+
+    public User findById(Long id) {
+        try {
+            return em.createQuery("select u from User u where u.id = :id", User.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
         }
 
         catch (Exception ex) {
             return null;
         }
+    }
+
+    public void update(User user) {
+        em.merge(user);
     }
 
     public boolean login(String email, String password) {
