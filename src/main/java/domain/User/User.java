@@ -4,6 +4,8 @@ import Authentication.UserDTO;
 import domain.Link.Link;
 import org.apache.commons.codec.digest.DigestUtils;
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,15 +19,19 @@ public class User implements Serializable {
     private long id;
 
     @Column(nullable=false, length=128)
+    @Email(message = "Email should be valid")
     private String email;
 
     @Column(nullable=false, length=128)
+    @NotNull(message = "Name cannot be null")
     private String firstName;
 
     @Column(nullable=false, length=128)
+    @NotNull(message = "Name cannot be null")
     private String lastName;
 
     @Column(nullable=false, length=128) //sha-512 + hex
+    @NotNull(message = "Name cannot be null")
     private String password;
 
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)

@@ -5,12 +5,15 @@ import interceptor.SimpleInterceptor;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
+
+import static javax.transaction.Transactional.TxType.REQUIRED;
 
 @Stateless
 @Interceptors(SimpleInterceptor.class)
@@ -29,10 +32,6 @@ public class UserRepo implements IUserRepo {
     public String save(User person)
     {
         if(getRules(person).isEmpty()) {
-            System.out.println("saving user");
-            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("myPU");
-            System.out.println(person.toString());
-            EntityManager em = entityManagerFactory.createEntityManager();
             em.persist(person);
             return person.toString();
         }
@@ -71,8 +70,16 @@ public class UserRepo implements IUserRepo {
         }
     }
 
-    public void update(User user) {
-        em.merge(user);
+    @Transactional(REQUIRED)
+    public String update(User user) {
+        if(getRules(user).isEmpty()) {
+            em.merge(user);
+            return user.toString();
+        }
+
+        else {
+            return getRules(user);
+        }
     }
 
     public boolean login(String email, String password) {

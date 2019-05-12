@@ -13,8 +13,7 @@
                            id="firstName"
                            type="text"
                            v-model="form.firstName"
-                           placeholder="Voornaam"
-                           required>
+                           placeholder="Voornaam">
                 </div>
 
                 <div class="mb-4">

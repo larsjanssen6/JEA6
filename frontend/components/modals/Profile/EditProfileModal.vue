@@ -68,9 +68,10 @@
 
         methods: {
             update() {
-                axios.put('/api/user', this.form).then((response) => {
+                axios.post('/api/user', this.form).then((response) => {
                     alert('Profiel geupdate!');
-                    window.location.reload();
+                    console.log(response);
+//                    window.location.reload();
                 });
             }
         }

@@ -10,5 +10,5 @@ public interface IUserRepo {
     User findById(Long id);
     boolean login(String email, String password);
     String getRules(User user);
-    void update(User user);
+    String update(User user);
 }

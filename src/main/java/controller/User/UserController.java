@@ -36,15 +36,25 @@ public class UserController {
         return userRepo.findById(userId);
     }
 
-    @PUT
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
     public Response update(User user, @Context HttpServletRequest req)
     {
         User dbUser = userRepo.findById(user.getId());
         user.setPassword(dbUser.getPassword());
         user.setRegisteredOn(new Date());
-        userRepo.update(user);
-        return Response.ok().entity(user).build();
+
+        final String result = userRepo.update(user);
+
+        Object response = new Object() {
+            public final String response = result;
+        };
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(response)
+                .build();
     }
 }
